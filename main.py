@@ -20,7 +20,7 @@ HEADERS = {'user-agent': 'sltpn3-1.0.0'}
 @app.route("/reverse_geocode")
 def reverse_geocode():
     lat = request.args.get('lat', '')
-    lon = request.args.get('lon', '')
+    lon = request.args.get('lon', '') 
     result = {'loc_name': ''}
     if lat and lon:
         url = NOMINATIM_URL.format(lat, lon)
