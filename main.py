@@ -1,6 +1,5 @@
 from flask import Flask, request
 # from geopy.geocoders import GoogleV3
-import re
 import requests
 
 app = Flask(__name__)
@@ -20,16 +19,16 @@ HEADERS = {'user-agent': 'sltpn3-1.0.0'}
 @app.route("/reverse_geocode")
 def reverse_geocode():
     lat = request.args.get('lat', '')
-    lon = request.args.get('lon', '') 
-    result = {'loc_name': ''}
+    lon = request.args.get('lon', '')
+    result = {'loc_name': '',
+              'road': ''}
     if lat and lon:
         url = NOMINATIM_URL.format(lat, lon)
 
         response = requests.get(url, headers=HEADERS)
         content = response.json()
         locs = []
-        if 'road' in content['address']:
-            locs.append(content['address']['road'])
+        
         if 'village' in content['address']:
             locs.append(content['address']['village'])
         if 'city' in content['address']:
@@ -40,8 +39,14 @@ def reverse_geocode():
             locs.append(content['address']['state'])
         if 'country' in content['address']:
             locs.append(content['address']['country'])
-
-        result['loc_name'] = ', '.join(locs[:3])
+        if 'road' in content['address']:
+            locs.insert(0, content['address']['road'])
+            result['road'] = content['address']['road']
+            result['area'] = ', '.join(locs[1:4])
+            result['loc_name'] = ', '.join(locs[:3])
+        else:
+            result['loc_name'] = ', '.join(locs[:3])
+            result['area'] = ', '.join(locs[:3])
     return result
 
 
